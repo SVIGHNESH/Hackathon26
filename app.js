@@ -212,3 +212,62 @@ const startRingtone = () => {
   const interval = setInterval(pulse, 900);
   ringtoneOscillator.onended = () => clearInterval(interval);
 };
+
+
+const stopRingtone = () => {
+  if (!ringtoneContext || !ringtoneOscillator) return;
+  ringtoneOscillator.stop();
+  ringtoneContext.close();
+  ringtoneContext = null;
+  ringtoneOscillator = null;
+  ringtoneGain = null;
+};
+
+const startAlarm = () => {
+  createAlarm();
+  if (!alarmGain) return;
+  alarmGain.gain.setTargetAtTime(0.35, alarmContext.currentTime, 0.05);
+  alarmActive = true;
+  alarmBtn.classList.add("is-active");
+  alarmBtn.querySelector(".action-card__desc").textContent = "Tap to stop";
+};
+
+const stopAlarm = () => {
+  if (!alarmGain || !alarmContext) return;
+  alarmGain.gain.setTargetAtTime(0.0001, alarmContext.currentTime, 0.05);
+  alarmActive = false;
+  alarmBtn.classList.remove("is-active");
+  alarmBtn.querySelector(".action-card__desc").textContent = "Draw attention";
+};
+
+if (sosBtn) {
+  sosBtn.addEventListener("click", triggerSOS);
+}
+
+if (alarmBtn) {
+  alarmBtn.addEventListener("click", () => {
+    if (alarmActive) {
+      stopAlarm();
+      return;
+    }
+    startAlarm();
+  });
+}
+
+if (acceptBtn) {
+  acceptBtn.addEventListener("click", () => {
+    stopRingtone();
+    window.location.href = "index.html";
+  });
+}
+
+if (declineBtn) {
+  declineBtn.addEventListener("click", () => {
+    stopRingtone();
+    window.location.href = "index.html";
+  });
+}
+
+if (callBody) {
+  window.addEventListener("click", startRingtone, { once: true });
+}
