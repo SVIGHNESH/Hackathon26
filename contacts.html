@@ -6,14 +6,14 @@
     <title>Emergency Contacts | She's Safe</title>
     <link rel="stylesheet" href="style.css" />
   </head>
-   <body>
+  <body>
     <div class="page">
       <header class="topbar">
         <div class="brand">
           <span class="brand__dot"></span>
           <div>
-            <p class="brand__title">Emergency Contact</p>
-            <p class="brand__tag">Primary number for SOS</p>
+            <p class="brand__title">Emergency Contacts</p>
+            <p class="brand__tag">Five contacts for SOS</p>
           </div>
         </div>
         <a class="ghost-btn" href="index.html">Back</a>
@@ -21,33 +21,128 @@
       <main class="panel">
         <form class="contact-form" id="contactForm">
           <label class="field">
-            <span>Primary contact number</span>
-            <input
-              id="contact1"
-              name="contact1"
-              type="tel"
-              inputmode="tel"
-              placeholder="e.g. 9876543210"
-              autocomplete="tel"
-              required
-            />
+            <span>Emergency contact 1</span>
+            <div class="field__row">
+              <input
+                id="contact1"
+                name="contact1"
+                type="tel"
+                inputmode="tel"
+                placeholder="e.g. 9876543210"
+                autocomplete="tel"
+                data-contact-input
+                required
+              />
+              <button
+                class="secondary-btn secondary-btn--mini"
+                type="button"
+                data-pick-contact="0"
+              >
+                Pick
+              </button>
+            </div>
+          </label>
+          <label class="field">
+            <span>Emergency contact 2</span>
+            <div class="field__row">
+              <input
+                id="contact2"
+                name="contact2"
+                type="tel"
+                inputmode="tel"
+                placeholder="e.g. 9876543210"
+                autocomplete="tel"
+                data-contact-input
+                required
+              />
+              <button
+                class="secondary-btn secondary-btn--mini"
+                type="button"
+                data-pick-contact="1"
+              >
+                Pick
+              </button>
+            </div>
+          </label>
+          <label class="field">
+            <span>Emergency contact 3</span>
+            <div class="field__row">
+              <input
+                id="contact3"
+                name="contact3"
+                type="tel"
+                inputmode="tel"
+                placeholder="e.g. 9876543210"
+                autocomplete="tel"
+                data-contact-input
+                required
+              />
+              <button
+                class="secondary-btn secondary-btn--mini"
+                type="button"
+                data-pick-contact="2"
+              >
+                Pick
+              </button>
+            </div>
+          </label>
+          <label class="field">
+            <span>Emergency contact 4</span>
+            <div class="field__row">
+              <input
+                id="contact4"
+                name="contact4"
+                type="tel"
+                inputmode="tel"
+                placeholder="e.g. 9876543210"
+                autocomplete="tel"
+                data-contact-input
+                required
+              />
+              <button
+                class="secondary-btn secondary-btn--mini"
+                type="button"
+                data-pick-contact="3"
+              >
+                Pick
+              </button>
+            </div>
+          </label>
+          <label class="field">
+            <span>Emergency contact 5</span>
+            <div class="field__row">
+              <input
+                id="contact5"
+                name="contact5"
+                type="tel"
+                inputmode="tel"
+                placeholder="e.g. 9876543210"
+                autocomplete="tel"
+                data-contact-input
+                required
+              />
+              <button
+                class="secondary-btn secondary-btn--mini"
+                type="button"
+                data-pick-contact="4"
+              >
+                Pick
+              </button>
+            </div>
           </label>
           <p class="helper">
-            Default country code is +91. Enter a 10-digit mobile number.
+            Default country code is +91. Enter 5 mobile numbers (10 digits each).
           </p>
           <div class="button-row">
-            <button class="primary-btn" type="submit">Save Contact</button>
-            <button class="secondary-btn" type="button" id="pickContactBtn">
-              Pick from phonebook
-            </button>
+            <button class="primary-btn" type="submit">Save Contacts</button>
           </div>
           <div class="status" id="contactStatus" aria-live="polite"></div>
         </form>
-                <section class="note">
+        <section class="note">
           <h2>Why this matters</h2>
           <p>
-            Your SOS button uses this number to open WhatsApp instantly with
-            your location.
+            Your SOS button opens WhatsApp for all 5 contacts with your live
+            location. Use WhatsApp broadcast lists to notify them faster.
           </p>
         </section>
       </main>

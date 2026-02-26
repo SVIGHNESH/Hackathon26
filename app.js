@@ -1,11 +1,15 @@
-const storageKey = "contact1";
+const storageKey = "emergencyContacts";
 const statusEl = document.getElementById("status");
 const sosBtn = document.getElementById("sosBtn");
 const alarmBtn = document.getElementById("alarmBtn");
 const contactForm = document.getElementById("contactForm");
-const contactInput = document.getElementById("contact1");
+const contactInputs = Array.from(
+  document.querySelectorAll("[data-contact-input]")
+);
 const contactStatus = document.getElementById("contactStatus");
-const pickContactBtn = document.getElementById("pickContactBtn");
+const pickContactButtons = Array.from(
+  document.querySelectorAll("[data-pick-contact]")
+);
 const acceptBtn = document.getElementById("acceptBtn");
 const declineBtn = document.getElementById("declineBtn");
 const callBody = document.body.classList.contains("call-body");
@@ -38,62 +42,89 @@ const warnFileProtocol = () => {
   }
 };
 
-const getSavedContact = () => localStorage.getItem(storageKey) || "";
-
-const saveContact = (value) => {
-  localStorage.setItem(storageKey, value);
+const getSavedContacts = () => {
+  const raw = localStorage.getItem(storageKey);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
 };
 
-if (contactForm && contactInput) {
-  contactInput.value = getSavedContact();
+const saveContacts = (values) => {
+  localStorage.setItem(storageKey, JSON.stringify(values));
+};
+
+if (contactForm && contactInputs.length) {
+  const savedContacts = getSavedContacts();
+  contactInputs.forEach((input, index) => {
+    if (savedContacts[index]) {
+      input.value = savedContacts[index];
+    }
+  });
 
   contactForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    const value = contactInput.value.trim();
-    if (!value) {
-      contactStatus.textContent = "Please enter a phone number.";
+    const values = contactInputs.map((input) => input.value.trim());
+
+    if (values.some((value) => !value)) {
+      contactStatus.textContent = "Please enter all 5 phone numbers.";
       contactStatus.style.color = "#ff8b9b";
       return;
     }
-    const digitsOnly = value.replace(/\D/g, "");
-    if (digitsOnly.length !== 10) {
-      contactStatus.textContent = "Enter a 10-digit mobile number.";
+
+    const invalidIndex = values.findIndex((value) => {
+      const digitsOnly = value.replace(/\D/g, "");
+      return digitsOnly.length !== 10;
+    });
+
+    if (invalidIndex !== -1) {
+      contactStatus.textContent = `Contact ${invalidIndex + 1} must be a 10-digit mobile number.`;
       contactStatus.style.color = "#ff8b9b";
       return;
     }
-    saveContact(value);
-    contactStatus.textContent = "Saved successfully.";
+
+    saveContacts(values);
+    contactStatus.textContent = "Saved all emergency contacts.";
     contactStatus.style.color = "#33d17a";
   });
 }
 
-if (pickContactBtn && contactInput) {
-  pickContactBtn.addEventListener("click", async () => {
-    if (!("contacts" in navigator) || !navigator.contacts.select) {
-      contactStatus.textContent =
-        "Contact picker not supported on this device/browser.";
-      contactStatus.style.color = "#ff8b9b";
-      return;
-    }
+if (pickContactButtons.length && contactInputs.length) {
+  pickContactButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!("contacts" in navigator) || !navigator.contacts.select) {
+        contactStatus.textContent =
+          "Contact picker not supported on this device/browser.";
+        contactStatus.style.color = "#ff8b9b";
+        return;
+      }
 
-    try {
-      const contacts = await navigator.contacts.select(["tel"], {
-        multiple: false,
-      });
-      const picked = contacts && contacts[0] && contacts[0].tel;
-      const phone = Array.isArray(picked) ? picked[0] : picked;
-      if (phone) {
-        contactInput.value = phone;
-        contactStatus.textContent = "Contact loaded. Save to confirm.";
-        contactStatus.style.color = "#33d17a";
-      } else {
-        contactStatus.textContent = "No phone number found on contact.";
+      const index = Number(button.dataset.pickContact);
+      const targetInput = contactInputs[index];
+      if (!targetInput) return;
+
+      try {
+        const contacts = await navigator.contacts.select(["tel"], {
+          multiple: false,
+        });
+        const picked = contacts && contacts[0] && contacts[0].tel;
+        const phone = Array.isArray(picked) ? picked[0] : picked;
+        if (phone) {
+          targetInput.value = phone;
+          contactStatus.textContent = "Contact loaded. Save to confirm.";
+          contactStatus.style.color = "#33d17a";
+        } else {
+          contactStatus.textContent = "No phone number found on contact.";
+          contactStatus.style.color = "#ff8b9b";
+        }
+      } catch (error) {
+        contactStatus.textContent = "Contact selection canceled.";
         contactStatus.style.color = "#ff8b9b";
       }
-    } catch (error) {
-      contactStatus.textContent = "Contact selection canceled.";
-      contactStatus.style.color = "#ff8b9b";
-    }
+    });
   });
 }
 
@@ -124,10 +155,22 @@ const openWhatsappWithCoords = (number, lat, lon) => {
   window.open(whatsappURL, "_blank");
 };
 
+const openWhatsappForContacts = (numbers, lat, lon) => {
+  numbers.forEach((number, index) => {
+    setTimeout(() => {
+      openWhatsappWithCoords(number, lat, lon);
+    }, index * 600);
+  });
+};
+
 const triggerSOS = () => {
-  const number = getSavedContact();
-  if (!number) {
-    updateStatus("Set a primary contact before using SOS.", true);
+  const numbers = getSavedContacts();
+  if (!numbers.length) {
+    updateStatus("Set emergency contacts before using SOS.", true);
+    return;
+  }
+  if (numbers.length < 5) {
+    updateStatus("Please save all 5 emergency contacts.", true);
     return;
   }
   updateStatus("Fetching location...");
@@ -142,7 +185,7 @@ const triggerSOS = () => {
       console.log(position.coords);
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
-      openWhatsappWithCoords(number, lat, lon);
+      openWhatsappForContacts(numbers, lat, lon);
     },
     (error) => {
       console.log("Error: ", error);
@@ -155,7 +198,7 @@ const triggerSOS = () => {
         "Location is unavailable. Use a demo location instead?"
       );
       if (useDemo) {
-        openWhatsappWithCoords(number, 28.6139, 77.209);
+        openWhatsappForContacts(numbers, 28.6139, 77.209);
       }
     },
     { enableHighAccuracy: true, timeout: 10000 }

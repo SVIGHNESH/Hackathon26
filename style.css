@@ -216,6 +216,16 @@ body {
   font-size: 1rem;
 }
 
+.field__row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.field__row input {
+  flex: 1;
+}
+
 .primary-btn {
   background: var(--accent);
   border: none;
@@ -236,6 +246,12 @@ body {
   border-radius: 999px;
   cursor: pointer;
   transition: transform 0.2s ease, border 0.2s ease;
+}
+
+.secondary-btn--mini {
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .secondary-btn:hover {
