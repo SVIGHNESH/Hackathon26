@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>She's Safe</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand__dot"></span>
+          <div>
+            <p class="brand__title">She's Safe</p>
+            <p class="brand__tag">Instant SOS, right now</p>
+          </div>
+        </div>
+        <a class="ghost-btn" href="contacts.html">Contacts</a>
+      </header>
+
+      <main class="sos">
+        <div class="sos__status" id="status">Ready to send SOS</div>
+        <button class="sos__button" id="sosBtn" type="button">
+          <span class="sos__ring"></span>
+          <span class="sos__label">SOS</span>
+          <span class="sos__sub">Tap to alert</span>
+        </button>
+        <div class="actions">
+          <a class="action-card" href="fakecall.html">
+            <span class="action-card__title">Fake Call</span>
+            <span class="action-card__desc">Get a quick exit</span>
+          </a>
+          <button class="action-card" id="alarmBtn" type="button">
+            <span class="action-card__title">Loud Alarm</span>
+            <span class="action-card__desc">Draw attention</span>
+          </button>
+        </div>
+      </main>
+
+      <footer class="footer">
+        <p>Keep your primary contact updated for fastest response.</p>
+      </footer>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>
