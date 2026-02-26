@@ -66,3 +66,149 @@ if (contactForm && contactInput) {
     contactStatus.style.color = "#33d17a";
   });
 }
+
+if (pickContactBtn && contactInput) {
+  pickContactBtn.addEventListener("click", async () => {
+    if (!("contacts" in navigator) || !navigator.contacts.select) {
+      contactStatus.textContent =
+        "Contact picker not supported on this device/browser.";
+      contactStatus.style.color = "#ff8b9b";
+      return;
+    }
+
+    try {
+      const contacts = await navigator.contacts.select(["tel"], {
+        multiple: false,
+      });
+      const picked = contacts && contacts[0] && contacts[0].tel;
+      const phone = Array.isArray(picked) ? picked[0] : picked;
+      if (phone) {
+        contactInput.value = phone;
+        contactStatus.textContent = "Contact loaded. Save to confirm.";
+        contactStatus.style.color = "#33d17a";
+      } else {
+        contactStatus.textContent = "No phone number found on contact.";
+        contactStatus.style.color = "#ff8b9b";
+      }
+    } catch (error) {
+      contactStatus.textContent = "Contact selection canceled.";
+      contactStatus.style.color = "#ff8b9b";
+    }
+  });
+}
+
+warnFileProtocol();
+
+const normalizePhoneNumber = (value) => {
+  const cleaned = value.replace(/\s+/g, "").replace(/[^0-9+]/g, "");
+  if (cleaned.startsWith("+")) {
+    return cleaned.replace(/^\+/, "");
+  }
+  if (cleaned.startsWith("91") && cleaned.length > 10) {
+    return cleaned;
+  }
+  return `91${cleaned}`;
+};
+
+const buildWhatsappUrl = (number, message) => {
+  const encoded = encodeURIComponent(message);
+  const normalized = normalizePhoneNumber(number);
+  return `https://wa.me/${normalized}?text=${encoded}`;
+};
+
+const openWhatsappWithCoords = (number, lat, lon) => {
+  const mapsLink = `https://maps.google.com/?q=${lat},${lon}`;
+  const message = `\ud83c\udd98 I need help! My current location: ${mapsLink} — Please reach me immediately.`;
+  const whatsappURL = buildWhatsappUrl(number, message);
+  updateStatus("Opening WhatsApp...");
+  window.open(whatsappURL, "_blank");
+};
+
+const triggerSOS = () => {
+  const number = getSavedContact();
+  if (!number) {
+    updateStatus("Set a primary contact before using SOS.", true);
+    return;
+  }
+  updateStatus("Fetching location...");
+
+  if (!navigator.geolocation) {
+    updateStatus("Geolocation not supported on this device.", true);
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      console.log(position.coords);
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      openWhatsappWithCoords(number, lat, lon);
+    },
+    (error) => {
+      console.log("Error: ", error);
+      const details = error && error.message ? ` (${error.message})` : "";
+      updateStatus(
+        `Unable to access location. Allow permission and reload.${details}`,
+        true
+      );
+      const useDemo = window.confirm(
+        "Location is unavailable. Use a demo location instead?"
+      );
+      if (useDemo) {
+        openWhatsappWithCoords(number, 28.6139, 77.209);
+      }
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+};
+
+const createAlarm = () => {
+  if (alarmContext) return;
+  alarmContext = new (window.AudioContext || window.webkitAudioContext)();
+  alarmOscillator = alarmContext.createOscillator();
+  alarmGain = alarmContext.createGain();
+  alarmOscillator.type = "square";
+  alarmOscillator.frequency.value = 880;
+  alarmGain.gain.value = 0.0001;
+  alarmOscillator.connect(alarmGain);
+  alarmGain.connect(alarmContext.destination);
+  alarmOscillator.start();
+};
+
+const startRingtone = () => {
+  if (!callBody || ringtoneContext) return;
+  ringtoneContext = new (window.AudioContext || window.webkitAudioContext)();
+  ringtoneOscillator = ringtoneContext.createOscillator();
+  ringtoneGain = ringtoneContext.createGain();
+  ringtoneOscillator.type = "square";
+  ringtoneOscillator.frequency.value = 960;
+  ringtoneGain.gain.value = 0.0;
+  ringtoneOscillator.connect(ringtoneGain);
+  ringtoneGain.connect(ringtoneContext.destination);
+  ringtoneOscillator.start();
+
+  const pulse = () => {
+    if (!ringtoneGain || !ringtoneContext) return;
+    ringtoneOscillator.frequency.setValueAtTime(
+      960,
+      ringtoneContext.currentTime
+    );
+    ringtoneGain.gain.setTargetAtTime(0.3, ringtoneContext.currentTime, 0.03);
+    setTimeout(() => {
+      if (!ringtoneGain || !ringtoneContext) return;
+      ringtoneOscillator.frequency.setValueAtTime(
+        760,
+        ringtoneContext.currentTime
+      );
+      ringtoneGain.gain.setTargetAtTime(
+        0.0,
+        ringtoneContext.currentTime,
+        0.05
+      );
+    }, 320);
+  };
+
+  pulse();
+  const interval = setInterval(pulse, 900);
+  ringtoneOscillator.onended = () => clearInterval(interval);
+};
