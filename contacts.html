@@ -18,3 +18,28 @@
         </div>
         <a class="ghost-btn" href="index.html">Back</a>
       </header>
+      <main class="panel">
+        <form class="contact-form" id="contactForm">
+          <label class="field">
+            <span>Primary contact number</span>
+            <input
+              id="contact1"
+              name="contact1"
+              type="tel"
+              inputmode="tel"
+              placeholder="e.g. 9876543210"
+              autocomplete="tel"
+              required
+            />
+          </label>
+          <p class="helper">
+            Default country code is +91. Enter a 10-digit mobile number.
+          </p>
+          <div class="button-row">
+            <button class="primary-btn" type="submit">Save Contact</button>
+            <button class="secondary-btn" type="button" id="pickContactBtn">
+              Pick from phonebook
+            </button>
+          </div>
+          <div class="status" id="contactStatus" aria-live="polite"></div>
+        </form>
