@@ -286,3 +286,107 @@ body {
 .call-body {
   background: radial-gradient(circle at top, #0b0d14 0%, #000 70%);
 }
+
+.call {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.call__status {
+  font-size: 0.95rem;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.call__avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle at top, #ff8b9b, #ff2e4f);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.2rem;
+  animation: ring 1.4s infinite;
+}
+
+.call__name {
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.call__controls {
+  display: flex;
+  gap: 24px;
+  margin-top: 8px;
+}
+
+.call__btn {
+  width: 120px;
+  padding: 14px 0;
+  border-radius: 999px;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.call__btn--decline {
+  background: #d12c2c;
+}
+
+.call__btn--accept {
+  background: #1eb36b;
+}
+
+.call__exit {
+  margin-top: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+}
+
+@keyframes ring {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 46, 79, 0.5);
+  }
+  70% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 16px rgba(255, 46, 79, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 46, 79, 0);
+  }
+}
+
+@media (max-width: 600px) {
+  .sos__button {
+    width: 190px;
+    height: 190px;
+  }
+
+  .panel {
+    padding: 20px;
+  }
+}
